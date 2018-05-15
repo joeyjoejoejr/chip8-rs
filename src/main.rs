@@ -10,7 +10,7 @@ fn main() {
         process::exit(1);
     });
     let rom_bin = read_rom(rom_file_name).unwrap_or_else(|err| {
-        eprintln!("Error reading rom: {:?}", err);
+        eprintln!("Error reading rom: {}", err);
         process::exit(1);
     });
     println!("{:02x?}{:02x?}", rom_bin[0], rom_bin[1]);
