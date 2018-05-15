@@ -4,6 +4,8 @@ use std::fs::File;
 use std::io;
 use std::io::Read;
 
+mod chip8;
+
 fn main() {
     let rom_file_name = env::args().nth(1).unwrap_or_else(|| {
         eprintln!("usage: chip8-rs rom_file");
@@ -13,7 +15,8 @@ fn main() {
         eprintln!("Error reading rom: {}", err);
         process::exit(1);
     });
-    println!("{:02x?}{:02x?}", rom_bin[0], rom_bin[1]);
+    let mut emulator = chip8::Chip8::new();
+    emulator.run(rom_bin);
 }
 
 fn read_rom(rom_file: String) -> Result<Box<[u8]>, io::Error> {
