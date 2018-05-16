@@ -1,16 +1,19 @@
 mod cpu;
+use super::screen;
 
 #[derive(Debug)]
 pub struct Chip8 {
   pc: usize,
   cpu: cpu::CPU,
+  screen: screen::Screen,
 }
 
 impl Chip8 {
   pub fn new() -> Chip8 {
     Chip8 {
        pc: 0,
-       cpu: cpu::CPU::default()
+       cpu: cpu::CPU::default(),
+       screen: screen::Screen::default(),
     }
   }
 
@@ -18,7 +21,7 @@ impl Chip8 {
     loop {
       let instruction = (rom_bin[self.pc] as u16) << 8 | (rom_bin[self.pc + 1] as u16);
       println!("Instruction: {:04x?}", instruction);
-      println!("{:?}", self);
+      println!("{:#?}", self);
       let opcode = instruction & 0xF000;
 
       match opcode {

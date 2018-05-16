@@ -5,6 +5,7 @@ use std::io;
 use std::io::Read;
 
 mod chip8;
+mod screen;
 
 fn main() {
     let rom_file_name = env::args().nth(1).unwrap_or_else(|| {
