@@ -1,7 +1,9 @@
+mod cpu;
+
 #[derive(Debug)]
 pub struct Chip8 {
   pc: usize,
-  vx: [u8; 16],
+  cpu: Box<cpu::CPU>,
 }
 
 impl Chip8 {
