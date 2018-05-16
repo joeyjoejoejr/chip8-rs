@@ -3,14 +3,14 @@ mod cpu;
 #[derive(Debug)]
 pub struct Chip8 {
   pc: usize,
-  cpu: Box<cpu::CPU>,
+  cpu: cpu::CPU,
 }
 
 impl Chip8 {
   pub fn new() -> Chip8 {
     Chip8 {
        pc: 0,
-       vx: [0; 16],
+       cpu: cpu::CPU::default()
     }
   }
 
@@ -26,7 +26,12 @@ impl Chip8 {
           // LD Vx, byte
           let x = ((instruction & 0x0F00) >> 8) as usize;
           let byte = (instruction & 0x00FF) as u8;
-          self.vx[x] = byte;
+          self.cpu.load_vx(x, byte);
+        },
+        0xA000 => {
+          // LD I, byte
+          let nnn = instruction & 0x0FFF;
+          self.cpu.load_i(nnn);
         },
         _ => panic!("Unknown opcode: {:x?}", opcode),
       }
