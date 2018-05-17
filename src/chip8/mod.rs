@@ -1,25 +1,32 @@
 mod cpu;
-use super::screen;
+mod memory_map;
+use super::screen::Screen;
+use self::cpu::CPU;
+use self::memory_map::MemoryMap;
 
 #[derive(Debug)]
 pub struct Chip8 {
   pc: usize,
-  cpu: cpu::CPU,
-  screen: screen::Screen,
+  cpu: CPU,
+  screen: Screen,
+  memory_map: MemoryMap,
 }
 
 impl Chip8 {
   pub fn new() -> Chip8 {
     Chip8 {
-       pc: 0,
-       cpu: cpu::CPU::default(),
-       screen: screen::Screen::default(),
+       pc: 0x0200,
+       cpu: CPU::default(),
+       screen: Screen::default(),
+       memory_map: MemoryMap::default(),
     }
   }
 
   pub fn run(&mut self, rom_bin: Box<[u8]>) {
+    self.memory_map.set_rom(rom_bin);
     loop {
-      let instruction = (rom_bin[self.pc] as u16) << 8 | (rom_bin[self.pc + 1] as u16);
+      let word = self.memory_map.read_word(self.pc);
+      let instruction = (word[0] as u16) << 8 | word[1] as u16;
       println!("Instruction: {:04x?}", instruction);
       println!("{:#?}", self);
       let opcode = instruction & 0xF000;

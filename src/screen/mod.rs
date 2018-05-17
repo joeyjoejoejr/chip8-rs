@@ -1,12 +1,12 @@
 use std::fmt;
 
 pub struct Screen {
-  screen: [[bool; 64]; 64],
+  screen: [[bool; 64]; 32],
 }
 
 impl Default for Screen {
   fn  default() -> Screen {
-    Screen { screen: [[false; 64]; 64] }
+    Screen { screen: [[false; 64]; 32] }
   }
 }
 
