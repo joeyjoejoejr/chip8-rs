@@ -43,6 +43,20 @@ impl Chip8 {
           let nnn = instruction & 0x0FFF;
           self.cpu.load_i(nnn);
         },
+        0xD000 => {
+          // DRW Vx Vy nibble
+          let vx = ((instruction & 0x0F00) >> 8) as usize;
+          let x = self.cpu.get_vx(vx);
+
+          let vy = ((instruction & 0x00F0) >> 4) as usize;
+          let y = self.cpu.get_vx(vy);
+
+          let num_bytes = (instruction & 0x000F) as usize;
+          for i in 0 .. num_bytes {
+            let byte = self.memory_map.read_byte(self.cpu.get_i() + i);
+            println!("Byte: {:b}", byte);
+          }
+        }
         _ => panic!("Unknown opcode: {:x?}", opcode),
       }
 
