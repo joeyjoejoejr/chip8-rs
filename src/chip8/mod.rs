@@ -46,16 +46,20 @@ impl Chip8 {
         0xD000 => {
           // DRW Vx Vy nibble
           let vx = ((instruction & 0x0F00) >> 8) as usize;
-          let x = self.cpu.get_vx(vx);
+          let x = self.cpu.get_vx(vx) as usize;
 
           let vy = ((instruction & 0x00F0) >> 4) as usize;
-          let y = self.cpu.get_vx(vy);
+          let y = self.cpu.get_vx(vy) as usize;
 
           let num_bytes = (instruction & 0x000F) as usize;
+          let mut sprite: Vec<u8> = Vec::new();
           for i in 0 .. num_bytes {
-            let byte = self.memory_map.read_byte(self.cpu.get_i() + i);
-            println!("Byte: {:b}", byte);
+            sprite.push(
+              self.memory_map.read_byte(self.cpu.get_i() + i)
+            );
           }
+          let collision = self.screen.draw_sprite(x, y, &sprite);
+          self.cpu.load_vx(0xF, collision as u8)
         }
         _ => panic!("Unknown opcode: {:x?}", opcode),
       }
