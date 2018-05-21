@@ -6,19 +6,23 @@ use self::memory_map::MemoryMap;
 
 #[derive(Debug)]
 pub struct Chip8 {
-  pc: usize,
   cpu: CPU,
   screen: Screen,
   memory_map: MemoryMap,
+  pc: usize,
+  sp: usize,
+  stack: [u16; 16],
 }
 
 impl Chip8 {
   pub fn new() -> Chip8 {
     Chip8 {
-       pc: 0x0200,
        cpu: CPU::default(),
        screen: Screen::default(),
        memory_map: MemoryMap::default(),
+       pc: 0x0200,
+       sp: 0,
+       stack: [0; 16]
     }
   }
 
@@ -32,6 +36,13 @@ impl Chip8 {
       let opcode = instruction & 0xF000;
 
       match opcode {
+        0x2000 => {
+          // CALL addr
+          let nnn = instruction & 0x0FFF;
+          self.stack[self.sp] = self.pc as u16;
+          self.sp += 1;
+          self.pc = nnn as usize;
+        },
         0x6000 => {
           // LD Vx, byte
           let x = ((instruction & 0x0F00) >> 8) as usize;
