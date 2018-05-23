@@ -71,8 +71,39 @@ impl Chip8 {
           }
           let collision = self.screen.draw_sprite(x, y, &sprite);
           self.cpu.load_vx(0xF, collision as u8)
+        },
+        0xF000 => {
+          match instruction & 0x00FF {
+            0x0033 => {
+              // LD B, Vx
+              let vx = ((instruction & 0x0F00) >> 8) as usize;
+              let x =  self.cpu.get_vx(vx);
+              let i = self.cpu.get_i();
+              println!("Vx is {}", vx);
+              println!("Loading {} into memory location {}", x, i);
+
+              let hundreds = x / 100;
+              self.memory_map.load_byte(i, hundreds);
+              let remainder = x % 100;
+              let tens = remainder / 10;
+              self.memory_map.load_byte(i + 1, tens);
+              let ones = remainder % 10;
+              self.memory_map.load_byte(i + 1, ones);
+            },
+            0x0065 => {
+              // LD Vx, [I]
+              let vx = ((instruction & 0x0F00) >> 8) as usize;
+              let i = self.cpu.get_i();
+
+              for j in 0..vx {
+                let byte  = self.memory_map.read_byte(i + j);
+                self.cpu.load_vx(j, byte);
+              }
+            }
+            _ => panic!("Unknown instruction: {:x?}", instruction),
+          }
         }
-        _ => panic!("Unknown opcode: {:x?}", opcode),
+        _ => panic!("Unknown instruction: {:x?}", instruction),
       }
 
       self.pc += 2;
