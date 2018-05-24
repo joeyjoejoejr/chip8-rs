@@ -1,8 +1,11 @@
 mod cpu;
 mod memory_map;
+mod opcode;
+
 use super::screen::Screen;
 use self::cpu::CPU;
 use self::memory_map::MemoryMap;
+use self::opcode::Opcode;
 
 #[derive(Debug)]
 pub struct Chip8 {
@@ -74,6 +77,9 @@ impl Chip8 {
         },
         0xF000 => {
           match instruction & 0x00FF {
+            0x0029 => {
+              // LD F, Vx
+            }
             0x0033 => {
               // LD B, Vx
               let vx = ((instruction & 0x0F00) >> 8) as usize;
