@@ -1,3 +1,1 @@
-pub struct Opcode {
-
-}
+pub struct Opcode {}

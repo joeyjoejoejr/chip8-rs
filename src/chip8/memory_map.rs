@@ -121,7 +121,7 @@ impl MemoryMap {
 
     pub fn read_byte(& self, addr: usize) -> u8 {
         match addr {
-            0x0200 ... 0x0FFF => self.ram[addr],
+            0x0000 ... 0x0FFF => self.ram[addr],
             _ => panic!("Unknown address: {:x?}", addr),
         }
     }
