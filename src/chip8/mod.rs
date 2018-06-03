@@ -39,6 +39,17 @@ impl Chip8 {
       println!("{:#?}", self);
 
       match instruction.opcode() {
+        instruction::O_CODE => {
+          match instruction.o_code() {
+            instruction::RET => {
+              self.sp -= 1;
+              let ret_addr = self.stack[self.sp];
+              self.stack[self.sp] = 0;
+              self.pc = ret_addr as usize;
+            },
+            _ => panic!("Unknown instruction: {:?}", instruction),
+          }
+        }
         instruction::CALL => {
           let nnn = instruction.nnn();
           self.stack[self.sp] = self.pc as u16;
@@ -50,13 +61,17 @@ impl Chip8 {
           let byte = instruction.nn();
           self.cpu.load_vx(x, byte);
         },
-        0xA000 => {
-          // LD I, byte
+        instruction::ADD_VX => {
+          let vx = instruction.vx() as usize;
+          let x = self.cpu.get_vx(vx);
+          let res = x + instruction.nn();
+          self.cpu.load_vx(vx, res);
+        },
+        instruction::LD_I => {
           let nnn = instruction.nnn();
           self.cpu.load_i(nnn);
         },
-        0xD000 => {
-          // DRW Vx Vy nibble
+        instruction::DRW => {
           let vx = instruction.vx() as usize;
           let x = self.cpu.get_vx(vx) as usize;
 
@@ -73,16 +88,14 @@ impl Chip8 {
           let collision = self.screen.draw_sprite(x, y, &sprite);
           self.cpu.load_vx(0xF, collision as u8)
         },
-        0xF000 => {
+        instruction::F_CODE => {
           match instruction.f_code() {
-            0x0029 => {
-              // LD F, Vx
+            instruction::LD_F => {
               let vx = instruction.vx() as usize;
               let x =  self.cpu.get_vx(vx);
               self.cpu.load_i(x as u16 * 5)
             },
-            0x0033 => {
-              // LD B, Vx
+            instruction::LD_B => {
               let vx = instruction.vx() as usize;
               let x =  self.cpu.get_vx(vx);
               let i = self.cpu.get_i();
@@ -97,8 +110,7 @@ impl Chip8 {
               let ones = remainder % 10;
               self.memory_map.load_byte(i + 1, ones);
             },
-            0x0065 => {
-              // LD Vx, [I]
+            instruction::LD_VX_I => {
               let vx = instruction.vx() as usize;
               let i = self.cpu.get_i();
 
