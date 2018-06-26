@@ -32,11 +32,11 @@ impl Chip8 {
   pub fn run(&mut self, rom_bin: Box<[u8]>) {
     self.memory_map.set_rom(rom_bin);
     loop {
+      self.screen.clear_screen();
+      self.screen.print_screen();
+
       let word = self.memory_map.read_word(self.pc);
       let instruction = Instruction::new(word);
-
-      println!("{:?}", instruction);
-      println!("{:#?}", self);
 
       match instruction.opcode() {
         instruction::O_CODE => {

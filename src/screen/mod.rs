@@ -1,4 +1,5 @@
 use std::fmt;
+use std::process::Command;
 
 pub struct Screen {
   screen: [[bool; 64]; 32],
@@ -27,6 +28,16 @@ impl Screen {
       i += 1;
     }
     collision
+  }
+
+  pub fn clear_screen(& self) {
+    Command::new("clear").output().unwrap_or_else(|e| {
+      panic!("Failed to clear screen: {}", e)
+    });
+  }
+
+  pub fn print_screen(& self) {
+    print!("{:#?}", self);
   }
 }
 
